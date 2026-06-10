@@ -1,0 +1,4 @@
+<?jelly escape-by-default='true'?>
+<div>
+  Provides various macro types to let users dynamically associate permission templates to users by claims.
+</div>
