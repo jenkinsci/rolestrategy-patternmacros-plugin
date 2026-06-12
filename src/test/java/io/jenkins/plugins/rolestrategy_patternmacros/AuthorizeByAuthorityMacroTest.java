@@ -1,22 +1,20 @@
 
-package com.synopsys.arc.jenkins.plugins.ownership.security.rolestrategy;
+package io.jenkins.plugins.rolestrategy_patternmacros;
 
 import com.michelin.cio.hudson.plugins.rolestrategy.PermissionEntry;
 import com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy;
-import com.synopsys.arc.jenkins.plugins.patterns.security.rolestrategy.AuthorizeByAuthorityMacro;
 import com.synopsys.arc.jenkins.plugins.rolestrategy.Macro;
-import com.synopsys.arc.jenkins.plugins.rolestrategy.RoleMacroExtension;
 import com.synopsys.arc.jenkins.plugins.rolestrategy.RoleType;
 
-import hudson.ExtensionList;
 import hudson.model.FreeStyleProject;
 import hudson.model.Item;
 import hudson.model.Job;
 import hudson.security.Permission;
-import org.junit.Rule;
-import org.junit.Test;
+
+import org.jenkinsci.plugins.rolestrategy.Settings;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +25,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -35,17 +35,26 @@ import java.util.List;
 @WithJenkins
 public class AuthorizeByAuthorityMacroTest {
 
-
-    @Rule
-    public final JenkinsRule j = new JenkinsRule();
+    private JenkinsRule j;
 
     @BeforeEach
-    void setUp(JenkinsRule jenkinsRule) {
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("testuser", "password"));
+    void setUp(JenkinsRule jenkinsRule) throws IOException {
+        this.j = jenkinsRule;
+        Settings.TREAT_USER_AUTHORITIES_AS_ROLES = true;
+        RoleBasedAuthorizationStrategy strategy = new RoleBasedAuthorizationStrategy();
+        Authentication adminUser = new UsernamePasswordAuthenticationToken("adminuser", "password");    
+    
+        strategy.doAddRole("globalRoles", "admin", "Overall/Administer", "true", "", "");
+        strategy.doAssignUserRole("globalRoles", "admin", "adminUser");
+
+        j.jenkins.setAuthorizationStrategy(strategy);
+
+        SecurityContextHolder.getContext().setAuthentication(adminUser);
     }
 
     @AfterEach
     void tearDown() {
+        Settings.TREAT_USER_AUTHORITIES_AS_ROLES = false;          
     }
 
     /**
@@ -54,7 +63,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testHasPermissionWithNullEntry() throws Exception {
         AuthorizeByAuthorityMacro macro = new AuthorizeByAuthorityMacro();
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         Permission permission = Item.READ;
         RoleType type = RoleType.Project;
@@ -71,7 +80,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testCanAccessTemplatePattern() throws Exception {
         AuthorizeByAuthorityMacro macro = new AuthorizeByAuthorityMacro();
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         Permission permission = Item.READ;
         RoleType type = RoleType.Project;
@@ -106,7 +115,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testCanAccessPatternTemplate() throws Exception {
         AuthorizeByAuthorityMacro macro = new AuthorizeByAuthorityMacro();
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         Permission permission = Item.READ;
         RoleType type = RoleType.Project;
@@ -138,7 +147,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testMultiplePatterns() throws Exception {
         AuthorizeByAuthorityMacro macro = new AuthorizeByAuthorityMacro();
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         Permission permission = Item.READ;
         RoleType type = RoleType.Project;
@@ -175,7 +184,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testWrongAuthoritiesBlock() throws Exception {
         AuthorizeByAuthorityMacro macro = new AuthorizeByAuthorityMacro();
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         Permission permission = Item.READ;
         RoleType type = RoleType.Project;
@@ -207,8 +216,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testPermissionTemplate() throws Exception {
         
-        j.jenkins.setAuthorizationStrategy(new RoleBasedAuthorizationStrategy());
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         RoleBasedAuthorizationStrategy strategy =  (RoleBasedAuthorizationStrategy)j.jenkins.getAuthorizationStrategy();
         strategy.doAddTemplate("builder",  "hudson.model.Item.Read,hudson.model.Item.Build", true);
@@ -246,8 +254,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testPermissionTemplateNoAuthorityMatch() throws Exception {
         
-        j.jenkins.setAuthorizationStrategy(new RoleBasedAuthorizationStrategy());
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
 
         RoleBasedAuthorizationStrategy strategy =  (RoleBasedAuthorizationStrategy)j.jenkins.getAuthorizationStrategy();
         strategy.doAddTemplate("builder",  "hudson.model.Item.Read,hudson.model.Item.Build", true);
@@ -277,6 +284,82 @@ public class AuthorizeByAuthorityMacroTest {
         assertThat("Has no build access to project ", project.hasPermission2(auth, Job.BUILD), equalTo(false));
     }
 
+
+    /**
+     * Test that wrong macro syntax does not give permission
+    */
+   
+    @Test
+    public void testPermissionTemplateWrongMacroSyntax() throws Exception {
+        
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
+
+        RoleBasedAuthorizationStrategy strategy =  (RoleBasedAuthorizationStrategy)j.jenkins.getAuthorizationStrategy();
+        strategy.doAddTemplate("builder",  "hudson.model.Item.Read,hudson.model.Item.Build", true);
+        
+        List<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority("test_builder")
+        );
+
+        JenkinsRule.DummySecurityRealm securityRealm = j.createDummySecurityRealm();
+        j.jenkins.setSecurityRealm(securityRealm);
+        j.jenkins.setAuthorizationStrategy(strategy);
+        j.jenkins.setCrumbIssuer(null);
+        
+        Authentication auth =
+            new UsernamePasswordAuthenticationToken(
+                "testuser",
+                "password",
+                authorities);
+
+        strategy.doAddRole("projectRoles", "@AuthorizeByAuthority(builder, WRONG_SYNTAX)",
+            "",
+            "true", "^pipeline.*", "builder");
+
+        strategy.doAssignUserRole("projectRoles", "@AuthorizeByAuthority(builder, WRONG_SYNTAX)", "testuser");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        assertThat("Has no build access to project ", project.hasPermission2(auth, Job.BUILD), equalTo(false));
+    }
+
+
+    /**
+     * Test that authorities with multiple separators are skipped
+    */
+   
+    @Test
+    public void testPermissionTemplateTemplateWithMultipleSeparators() throws Exception {
+        
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
+
+        RoleBasedAuthorizationStrategy strategy =  (RoleBasedAuthorizationStrategy)j.jenkins.getAuthorizationStrategy();
+        strategy.doAddTemplate("buil_der",  "hudson.model.Item.Read,hudson.model.Item.Build", true);
+        
+        List<GrantedAuthority> authorities = List.of(
+            new SimpleGrantedAuthority("test_buil_der")
+        );
+
+        JenkinsRule.DummySecurityRealm securityRealm = j.createDummySecurityRealm();
+        j.jenkins.setSecurityRealm(securityRealm);
+        j.jenkins.setAuthorizationStrategy(strategy);
+        j.jenkins.setCrumbIssuer(null);
+        
+        Authentication auth =
+            new UsernamePasswordAuthenticationToken(
+                "testuser",
+                "password",
+                authorities);
+
+        strategy.doAddRole("projectRoles", "@AuthorizeByAuthority(buil_der, PATTERN_TEMPLATE)",
+            "",
+            "true", "^pipeline.*", "buil_der");
+
+        strategy.doAssignUserRole("projectRoles", "@AuthorizeByAuthority(buil_der, PATTERN_TEMPLATE)", "testuser");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        assertThat("Has no build access to project ", project.hasPermission2(auth, Job.BUILD), equalTo(false));
+    }
+
     /**
      * Test that user with wrong authority does not have template assigned using macro
     */
@@ -284,8 +367,7 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testPermissionTemplateNoProjectNameMatch() throws Exception {
         
-        j.jenkins.setAuthorizationStrategy(new RoleBasedAuthorizationStrategy());
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-internal");
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-internal");
 
         RoleBasedAuthorizationStrategy strategy =  (RoleBasedAuthorizationStrategy)j.jenkins.getAuthorizationStrategy();
         strategy.doAddTemplate("builder",  "hudson.model.Item.Read,hudson.model.Item.Build", true);
@@ -323,10 +405,9 @@ public class AuthorizeByAuthorityMacroTest {
     @Test
     public void testPermissionTemplateMultipleAuthorities() throws Exception {
         
-        j.jenkins.setAuthorizationStrategy(new RoleBasedAuthorizationStrategy());
-        FreeStyleProject project = this.j.createFreeStyleProject("pipeline-test");
-
+        FreeStyleProject project = j.createFreeStyleProject("pipeline-test");
         RoleBasedAuthorizationStrategy strategy =  (RoleBasedAuthorizationStrategy)j.jenkins.getAuthorizationStrategy();
+        
         strategy.doAddTemplate("builder",  "hudson.model.Item.Read,hudson.model.Item.Build", true);
         strategy.doAddTemplate("configurer",  "hudson.model.Item.Read,hudson.model.Item.Configure", true);
         

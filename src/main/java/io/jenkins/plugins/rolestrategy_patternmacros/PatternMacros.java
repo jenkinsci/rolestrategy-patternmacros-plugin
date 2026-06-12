@@ -21,34 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package com.synopsys.arc.jenkins.plugins.patterns;
+package io.jenkins.plugins.rolestrategy_patternmacros;
 
 import hudson.Extension;
 import hudson.ExtensionList;
 import java.util.logging.Logger;
 
-import com.synopsys.arc.jenkins.plugins.patterns.security.rolestrategy.AuthorizeByAuthorityMacro;
 import com.synopsys.arc.jenkins.plugins.rolestrategy.RoleMacroExtension;
 
-import jenkins.model.GlobalConfiguration;
 import jenkins.model.Jenkins;
 
 /**
  * Contains global actions and configurations.
  * @since 0.0.1
- * @author Oleg Nenashev
+ * @author Jean pierre Brunod
  */
 @Extension
-public class PatternConfiguration extends GlobalConfiguration {
+public class PatternMacros {
     
     public static final String LOG_PREFIX="[PatternConfiguration] - ";
-    private static final Logger LOGGER = Logger.getLogger(PatternConfiguration.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(PatternMacros.class.getName());
 
     
-    public PatternConfiguration() throws Exception {
-	    load();
+    public PatternMacros() throws Exception {
         ExtensionList<RoleMacroExtension> currentMacros = Jenkins.get().getExtensionList(RoleMacroExtension.class);
-        currentMacros.forEach(macro -> LOGGER.info("Available Macro Extension: " + macro.getName()));
+        currentMacros.forEach(macro -> LOGGER.fine("Available Macro Extension: " + macro.getName()));
     }
 
 }

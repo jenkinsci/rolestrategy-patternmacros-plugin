@@ -29,15 +29,13 @@ Syntax is:
 @AuthorizeByAuthority(template, style)
 ```
 
-And you can optionally add a separator field as a third argument, which is, by default, the underscore `_` character.
-
 To use it, configure a new permission template in the `Permission Template` section in the Role Strategy Plugin and give it a name.
 
 ![Configure Permission Templates](./docs/images/permissiontemplates.png)
 
-The name of each template will identity a user `TEMPLATE` in AuthorizeByAuthority.
+The name of each template will identity a user `TEMPLATE` in AuthorizeByAuthority. The template name must not contain the default separator character, which is `_` and the macro will skip any template that contains this character.
 
-Then, in your external IdP, let's say a Keycloak, define roles for your users with an appropriate naming convention.
+Then, in your external IdP, let's say a Keycloak, define roles for your users with an appropriate naming convention. The roles must contain exactly one separator character. For example, `frontend-application_builder` and `backend-cron_builder` are valid, while `frontend_application_builder` is not.
 
 Presently you can use two different styles:
 
