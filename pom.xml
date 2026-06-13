@@ -59,58 +59,7 @@
           <groupId>org.jenkins-ci.plugins</groupId>
           <artifactId>role-strategy</artifactId>
       </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>token-macro</artifactId>
-          <optional>true</optional>
-      </dependency>
-      <dependency>
-          <groupId>com.synopsys.arc.jenkinsci.plugins</groupId>
-          <artifactId>job-restrictions</artifactId>
-          <optional>true</optional>
-      </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>script-security</artifactId>
-          <optional>true</optional>
-      </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>cloudbees-folder</artifactId>
-          <optional>true</optional>
-      </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>authorize-project</artifactId>
-          <!-- <version>1.1.0</version> -->
-          <optional>true</optional>
-      </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>security-inspector</artifactId>
-          <version>0.4</version>
-          <optional>true</optional>
-      </dependency>
-      <dependency>
-          <groupId>org.kohsuke</groupId>
-          <artifactId>access-modifier-suppressions</artifactId>
-          <version>1.34</version>
-          <scope>provided</scope>
-      </dependency>
-      <!--Plugins decoupled from the core. Would be great to make these deps optional.-->
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>mailer</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins</groupId>
-          <artifactId>apache-httpcomponents-client-4-api</artifactId>
-      </dependency>
-      <dependency>
-          <groupId>org.jenkins-ci.plugins.workflow</groupId>
-          <artifactId>workflow-cps</artifactId>
-      </dependency>
-      
+
       <!-- Test framework -->
       <dependency>
           <groupId>org.jenkins-ci.plugins.workflow</groupId>
@@ -128,7 +77,7 @@
           <artifactId>workflow-basic-steps</artifactId>
           <scope>test</scope>
       </dependency>
-      <dependency> <!--Implicitly required by folders-->
+      <dependency>
           <groupId>org.jenkins-ci.plugins</groupId>
           <artifactId>credentials</artifactId>
           <scope>test</scope>
