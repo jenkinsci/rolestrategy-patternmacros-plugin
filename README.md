@@ -1,5 +1,11 @@
-Role Strategy PatternMacros plugin
-=================================
+# Role Strategy PatternMacros plugin
+
+[![Build Status](https://ci.jenkins.io/buildStatus/icon?job=Plugins%2Frolestrategy-patternmacros-plugin%2Fmain)](https://ci.jenkins.io/job/Plugins/job/rolestrategy-patternmacros-plugin/job/master/)
+[![Contributors](https://img.shields.io/github/contributors/jenkinsci/rolestrategy-patternmacros-plugin.svg)](https://github.com/jenkinsci/rolestrategy-patternmacros-plugin/graphs/contributors)
+[![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/rolestrategy-patternmacros.svg)](https://plugins.jenkins.io/rolestrategy-patternmacros)
+[![GitHub release](https://img.shields.io/github/release/jenkinsci/rolestrategy-patternmacros-plugin.svg?label=changelog)](https://github.com/jenkinsci/rolestrategy-patternmacros-plugin/releases/latest)
+[![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/rolestrategy-patternmacros.svg?color=blue)](https://plugins.jenkins.io/rolestrategy-patternmacros)
+[![Gitter](https://badges.gitter.im/jenkinsci/rolestrategy-patternmacros-plugin.svg)](https://gitter.im/jenkinsci/rolestrategy-patternmacros-plugin)
 
 ## Introduction
 
