@@ -15,7 +15,7 @@
   <name>Role Strategy Pattern Macros extensions plugin</name>
   <packaging>hpi</packaging>
   <description>Provides automatic macro patterns based on user roles</description>
-  <url>https://github.com/jenkinsci/rolestrategy-patternmacros-plugin</url>
+  <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
 
   <licenses>
     <license>
