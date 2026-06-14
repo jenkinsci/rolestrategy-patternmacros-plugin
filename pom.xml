@@ -11,7 +11,7 @@
 
   <groupId>io.jenkins.plugins</groupId>
   <artifactId>rolestrategy-patternmacros</artifactId>
-  <version>${changelist}</version>
+  <version>${revision}${changelist}</version>
   <name>Role Strategy Pattern Macros extensions plugin</name>
   <packaging>hpi</packaging>
   <description>Provides automatic macro patterns based on user roles</description>
